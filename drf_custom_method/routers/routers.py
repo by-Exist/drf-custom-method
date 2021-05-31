@@ -16,11 +16,11 @@ class CustomMethodDefaultRouter(CustomMethodMixin, DefaultRouter):
 
 
 # Nested + Custom Method
-class NestedCustomMethodSimpleRouter(NestedMixin, SimpleRouter):
+class NestedCustomMethodSimpleRouter(NestedMixin, CustomMethodSimpleRouter):
     routes = custom_method_default_routes
 
 
-class NestedCustomMethodDefaultRouter(NestedMixin, DefaultRouter):
+class NestedCustomMethodDefaultRouter(NestedMixin, CustomMethodDefaultRouter):
     routes = custom_method_default_routes
 
 
