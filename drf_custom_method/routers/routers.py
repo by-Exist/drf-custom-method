@@ -5,10 +5,12 @@ from rest_framework.routers import (
     DefaultRouter,
     escape_curly_brackets,
 )
+from rest_framework_nested.routers import NestedSimpleRouter, NestedDefaultRouter
 
 
+# Custom Method Routers
+# =============================================================================
 custom_method_routes = [
-    # List route
     Route(
         url=r"^{prefix}{trailing_slash}$",
         mapping={"get": "list", "post": "create"},
@@ -22,7 +24,6 @@ custom_method_routes = [
         detail=False,
         initkwargs={},
     ),
-    # Detail route
     Route(
         url=r"^{prefix}/{lookup}{trailing_slash}$",
         mapping={
@@ -45,11 +46,6 @@ custom_method_routes = [
 
 
 class CustomMethodMixin:
-    """
-    Custom Method 라우터에 필요한 믹스인.
-    utils.decorators 내의 slash_editable_action 함수에 종속적이다.
-    """
-
     def _get_dynamic_route(self, route, action):
         initkwargs = route.initkwargs.copy()
         initkwargs.update(action.kwargs)
@@ -69,18 +65,43 @@ class CustomMethodMixin:
 
 
 class CustomMethodSimpleRouter(CustomMethodMixin, SimpleRouter):
-    """
-    Custom Method 기능이 추가된 SimpleRouter.
-    utils.decorators 내의 slash_editable_action에 종속적이다.
-    """
 
     routes = custom_method_routes
 
 
 class CustomMethodDefaultRouter(CustomMethodMixin, DefaultRouter):
-    """
-    Custom Method 기능이 추가된 DefaultRouter.
-    utils.decorators 내의 slash_editable_action에 종속적이다.
-    """
 
     routes = custom_method_routes
+
+
+# Nested Singleton Resource Custom Method Routers
+# =============================================================================
+sub_resource_singleton_routes = [
+    Route(
+        url=r"^{prefix}{trailing_slash}$",
+        mapping={"get": "retrieve", "put": "update", "patch": "partial_update",},
+        name="{basename}-detail",
+        detail=True,
+        initkwargs={"suffix": "Instance"},
+    ),
+    DynamicRoute(
+        url=r"^{prefix}{slash}{url_path}{trailing_slash}$",
+        name="{basename}-{url_name}",
+        detail=True,
+        initkwargs={},
+    ),
+]
+
+
+class NestedSingletonResourceCustomMethodSimpleRouter(
+    CustomMethodMixin, NestedSimpleRouter
+):
+
+    routes = sub_resource_singleton_routes
+
+
+class NestedSingletonResourceCustomMethodDefaultRouter(
+    CustomMethodMixin, NestedDefaultRouter
+):
+
+    routes = sub_resource_singleton_routes
