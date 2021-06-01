@@ -1,19 +1,15 @@
 from rest_framework.decorators import MethodMapper, pretty_name
-from rest_framework.decorators import action
 
 
-def slash_editable_action(
+def custom_action(
     methods=None,
     detail: bool = None,
-    slash: str = "/",  # here
+    # here
+    custom_method: bool = False,
     url_path: str = None,
     url_name: str = None,
     **kwargs
 ):
-    """
-    Custom Method 기능을 활용하기 위해 기존 action을 확장한 개념의 action 함수.
-    slash 파라미터가 추가되었다.
-    """
     methods = ["get"] if (methods is None) else methods
     methods = [method.lower() for method in methods]
 
@@ -28,7 +24,8 @@ def slash_editable_action(
         func.detail = detail
         func.url_path = url_path if url_path else func.__name__
         func.url_name = url_name if url_name else func.__name__.replace("_", "-")
-        func.slash = slash  # here
+        # here
+        func.custom_method = custom_method
         func.kwargs = kwargs
 
         if "name" not in kwargs and "suffix" not in kwargs:
